@@ -1,0 +1,83 @@
+import json
+from datetime import datetime
+
+def load_data():
+    try:
+        with open('expenses.json', 'r') as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+def save_data(data):
+    with open('expenses.json', 'w') as file:
+        json.dump(data, file, indent=2)
+
+def get_expense_categories():
+    return ["Food", "Utilities", "Transportation", "Entertainment", "Others"]
+
+def display_menu():
+    print("\nExpense Tracker Menu:")
+    print("1. Add Expense")
+    print("2. View Expenses")
+    print("3. Analyze Expenses")
+    print("4. Exit")
+
+def add_expense(data):
+    amount = float(input("Enter the expense amount: $"))
+    category = input("Enter the expense category: ")
+    if category not in get_expense_categories():
+        print("Invalid category. Choose from:", get_expense_categories())
+        return
+
+    description = input("Enter a short description: ")
+
+    expense = {
+        "amount": amount,
+        "category": category,
+        "description": description,
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    data.append(expense)
+    save_data(data)
+    print("Expense added successfully.")
+
+def view_expenses(data):
+    if not data:
+        print("No expenses found.")
+        return
+
+    print("\nExpense List:")
+    for expense in data:
+        print(f"{expense['date']} - ${expense['amount']} ({expense['category']}): {expense['description']}")
+
+def analyze_expenses(data):
+    if not data:
+        print("No expenses found.")
+        return
+
+    total_expenses = sum(expense['amount'] for expense in data)
+    print(f"\nTotal Expenses: ${total_expenses}")
+
+def main():
+    data = load_data()
+
+    while True:
+        display_menu()
+
+        choice = input("Enter your choice (1-4): ")
+
+        if choice == '1':
+            add_expense(data)
+        elif choice == '2':
+            view_expenses(data)
+        elif choice == '3':
+            analyze_expenses(data)
+        elif choice == '4':
+            print("Exiting Expense Tracker. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please choose from 1 to 4.")
+
+if _name_ == "_main_":
+    main()
